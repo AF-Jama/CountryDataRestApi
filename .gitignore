@@ -1,0 +1,11 @@
+// database connection configuration settings
+
+.env
+
+// node modules
+
+node_modules
+
+// idea text file
+
+idea.txt
