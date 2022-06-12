@@ -1,9 +1,17 @@
 const express = require('express')
-const {getAllCountries,getCountriesbyID,getSpecifiedCountries,requestARandomCountry,addCountry} = require('../controllers/countries_controller.js')
+const {getAllCountries,getCountriesbyID,getSpecifiedCountries,requestaRandomCountry,addCountry,updateCountry} = require('../controllers/countries_controller.js')
+const { Validator } = require("express-json-validator-middleware");
+
+const {validate} = new Validator()
+const {countrySchema,patchCountrySchema} = require('../middleware/json_validator.js');
+const { valid } = require('joi');
 
 const router = express.Router()
 
 router.get('/',(req,res)=>{
+    res.send({
+        msg:"Hello"
+    })
     
 })
 
@@ -13,15 +21,15 @@ router.get('/name',getSpecifiedCountries)
 
 router.get('/:id',getCountriesbyID) // returns country by id
 
-router.get('/random',requestARandomCountry)
+router.get('/rands',requestaRandomCountry)
 
 // post request 
-
-router.post('/add',addCountry)
+    
+router.post('/add',validate({body:countrySchema}),addCountry) // middleware that validates post 
 
 //put request
 
-router.patch('/:id/update')
+router.put('/update/:countryName',validate({body:patchCountrySchema}),updateCountry)
 
 
 module.exports = router;
