@@ -120,13 +120,38 @@ const addCountry = (req,res)=>{
     })
 }
 
+const deleteCountry = (req,res)=>{
+    pool.getConnection((err, conn) =>{
+        if (err) throw err;
+        let id = req.params.id;
+        id = parseInt(id)
+        if(id>202){
+            conn.query('DELETE FROM COUNTRYTABLE WHERE id = ?',id,(error,result,fields)=>{
+                if(!error){
+                    return res.send({
+                        msg:"Resource succesfully deleted",
+                    })
+                }
+                return res.send({
+                    msg:"Unable to delete resource",
+                })
+            })
+        }else{
+            res.send({
+                msg:"Cannot delete preset resources"
+            })
+        }
+    })
+}
+
 module.exports = {
     getAllCountries,
     getCountriesbyID,
     getSpecifiedCountries,
     requestaRandomCountry,
     addCountry,
-    updateCountry
+    updateCountry,
+    deleteCountry
 }
 
 
