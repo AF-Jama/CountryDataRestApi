@@ -40,10 +40,15 @@ app.get('/',(req,res)=>{
 })
 
 
-// // error handler 
-// app.use((err,req,res,next)=>{
-//     res.status(err.status).send('Something broke!')
-// })
+// error handler 
+app.use((err, req, res, next) => {
+    if(err){
+        res.send({
+            status:`${err.status}`,
+            msg:`${err.message}`
+        })
+    }
+  })
 
 
 
