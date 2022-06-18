@@ -1,9 +1,20 @@
 const { body } = require('express-validator');
 const pool = require('../config.js')
 
+// caching 
+const NodeCache = require( "node-cache" );
+const myCache = new NodeCache({
+    checkperiod:300    
+});
+
 // controller functions for different endpoints
 
 const getAllCountries = (req,res)=>{
+    if (myCache.has('all')){
+        console.log("FROM CACHE")
+        return res.send(myCache.get('all'))
+    }; // return cached result
+
     pool.getConnection((err, conn) => {
         if (err) throw err;
         conn.query('SELECT * FROM COUNTRYTABLE',(error,result,fields)=>{
@@ -13,13 +24,15 @@ const getAllCountries = (req,res)=>{
                 error.message = `Could not get all countries`
                 next(error) // triggers error handler middleware
             };
-            res.send(result)
+            myCache.set('all',result) // sets cache 
+            return res.send(result)
 
         })
     })
 }
 
 const getCountriesbyID = (req,res,next)=>{
+    if (myCache.has(req.params.id)) return res.send(myCache.get(req.params.id)) // cache with the key that references id
     pool.getConnection((err, conn) => {
         if (err) throw err;
         const id = req.params.id
@@ -30,6 +43,7 @@ const getCountriesbyID = (req,res,next)=>{
                 error.message = `Could not get country as id ${id} does not exist`
                 next(error) // triggers error handler middleware
             }
+            myCache.set(id,result) // sets cache
             res.send(result)
 
         })
@@ -38,6 +52,7 @@ const getCountriesbyID = (req,res,next)=>{
 }
 
 const getSpecifiedCountries = (req,res,next)=>{
+    if (myCache.has(req.query.name)) return res.send(myCache.get(req.query.name))
     pool.getConnection((err, conn) => {
         if (err) throw err;
         const countries = req.query.name // gets query parameter 
@@ -49,24 +64,24 @@ const getSpecifiedCountries = (req,res,next)=>{
                     error.message = `Could not find resource with country name`
                     next(error)
                 }
+                myCache.set(req.query.name,result)
                 res.send(result)
             })
         })
 }
 
 
-function requestaRandomCountry(req,res){
+function requestaRandomCountry(req,res,next){
     pool.getConnection((err, conn) => {
         if (err) throw err;
         console.log("HERE 1")
         conn.query('SELECT * FROM COUNTRYTABLE ORDER BY RAND() LIMIT 1',(error,result,fields)=>{
             conn.release();
-            console.log('HERE 2')
             if(error){
-                console.log("There was an error")
+                error.message = "Error with requesting random country"
+                next(error) // triggers error handler middleware
             }
-            console.log("Here 3")
-            res.send(result)
+            return res.send(result)
 
         })
     })
