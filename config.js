@@ -14,4 +14,4 @@ const pool = createPool({
 //     console.log("No error",conn)
 // })
 
-module.exports = pool;
+module.exports = pool; 

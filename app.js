@@ -44,7 +44,7 @@ app.get('/',(req,res)=>{
 app.use((err, req, res, next) => {
     if(err){
         res.send({
-            status:`${err.status}`,
+            status:`${err.status||400}`,
             msg:`${err.message}`
         })
     }

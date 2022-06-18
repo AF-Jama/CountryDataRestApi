@@ -128,7 +128,7 @@ const addCountry = (req,res,next)=>{
                 error.message = "Could not add country. Probably due to the country already existing"
                 next(error)
             }else{
-                res.send({
+                return res.send({
                     msg:"Succesfully added country",
                     body:req.body
                 })
