@@ -160,7 +160,7 @@ const deleteCountry = (req,res,next)=>{
         id = parseInt(id)
         if(id>202){
             conn.query('DELETE FROM COUNTRYTABLE WHERE id = ?',id,(error,result,fields)=>{
-                if(!error){
+                if(!error){ // triggered when query is succesful
                     return res.send({
                         msg:"Resource succesfully deleted",
                     })
